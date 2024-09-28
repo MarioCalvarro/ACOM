@@ -1,4 +1,5 @@
 '''
+GRUPO: Beñat Pérez de Arenaza Eizaguirre, Mario Calvarro Marines y Diego Ostos Arellano
 Para la resolución de este ejercicio hemos usado programación dinámica.
 En primer lugar hemos inicializado una matriz de nxmx3 a una cota superior de los posibles valores que
 podría tomar una cierta casilla. Para ello hemos sumado todos los valores positivos de la tabla.

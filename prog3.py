@@ -5,13 +5,6 @@ import time
 def mul_mat_escuela(A, B, n):
     return [[sum([A[i][k] * B[k][j] for k in range(n)]) for j in range(n)] for i in range(n)]
 
-def add_padding(matrix):
-    n = len(matrix)
-    for i in range(n):
-        matrix[i].append(0);
-    matrix.append([0 for _ in range(n + 1)])
-
-
 def remove_padding(matrix):
     n = len(matrix)
     return [row[:n-1] for row in matrix[:n-1]]
@@ -30,8 +23,6 @@ def mul_mat_strassen(A, B, n):
     padding = False
     if (n % 2 != 0):
         # Make matrices even-sized if necessary
-        # add_padding(A)
-        # add_padding(B)
         A = [r + [0] for r in A] + [[0] * (n + 1)]
         B = [r + [0] for r in B] + [[0] * (n + 1)]
         n += 1

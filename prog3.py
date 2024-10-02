@@ -1,9 +1,9 @@
 import numpy as np
 import random as rnd
+import time
 
 def mul_mat_escuela(A, B, n):
     return [[sum([A[i][k] * B[k][j] for k in range(n)]) for j in range(n)] for i in range(n)]
-
 
 def add_padding(matrix):
     n = len(matrix)
@@ -82,10 +82,18 @@ def mul_mat_strassen(A, B, n):
 def compare_with_np(A, B):
     A_np = np.array(A)
     B_np = np.array(B)
-    C_np = np.matmul(A_np, B_np)
-    C_pre = mul_mat_strassen(A, B, len(A))
-    C = np.array(C_pre)
 
+    start = time.time()
+    C_np = np.matmul(A_np, B_np)
+    end = time.time()
+    print(f"Numpy ha tardado {end - start}s.")
+
+    start = time.time()
+    C_pre = mul_mat_strassen(A, B, len(A))
+    end = time.time()
+    print(f"Nuestra función ha tardado {end - start}s.")
+
+    C = np.array(C_pre)
     return (C==C_np).all()
 
 def generar_matrices(m):

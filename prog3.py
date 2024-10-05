@@ -96,3 +96,5 @@ def generar_matrices(m):
 def probar(m):
     A, B = generar_matrices(m)
     return compare_with_np(A, B)
+
+probar(1000)

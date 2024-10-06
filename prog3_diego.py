@@ -99,3 +99,21 @@ def mul_mat_strassen(A, B, n):
    
 
     return C
+
+import random
+
+def generar_matriz_aleatoria(n, min_val=-100.0, max_val=100.0):
+    return [[random.uniform(min_val, max_val) for _ in range(n)] for _ in range(n)]
+
+# Ejemplo de uso
+n = 100
+A = generar_matriz_aleatoria(n)
+B = generar_matriz_aleatoria(n)
+
+SOL_escuela = mul_mat_escuela(A,B,n)
+SOL_strassen = mul_mat_escuela(A,B,n)
+
+for i in range(n):
+    for j in range(n):
+        if(SOL_escuela[i][j] != SOL_strassen[i][j]):
+            print("Distintos")

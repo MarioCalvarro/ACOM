@@ -44,7 +44,6 @@ def resta_matrices(A, B):
     return [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
 
 def mul_mat_strassen(A, B, n):
-    """Perform matrix multiplication using Strassen's algorithm."""
     if n <= 5:
         return mul_mat_escuela(A, B, n)
 
@@ -105,15 +104,15 @@ def compare_with_np(A, B):
 
     C_np = np.matmul(A_np, B_np)
 
-    C_pre = mul_mat_escuela(A, B, len(A))
+    C_pre = mul_mat_strassen(A, B, len(A))
 
     C = np.array(C_pre)
     return (C==C_np).all()
 
 def generar_matrices(m):
-    A = [[rnd.randint(0, 100) for _ in range(m)] for _ in range(m)]
+    A = [[float(rnd.randint(1, 100)) for _ in range(m)] for _ in range(m)]
 
-    B = [[rnd.randint(0, 100) for _ in range(m)] for _ in range(m)]
+    B = [[float(rnd.randint(1, 100)) for _ in range(m)] for _ in range(m)]
     return A, B
 
 def probar(m):

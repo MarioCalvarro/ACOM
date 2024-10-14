@@ -30,7 +30,7 @@ def pollard_pm1(n, B):
         if 1 < d < n:
             return d  # Devuelve el divisor primo encontrado
 
-    return None  # No se encontró factor en el rango dado
+    return pollard_pm1(n, B)  # No se encontró factor en el rango dado
 
 # Ejemplo de uso:
 n = 8051  # Producto de dos primos p y q

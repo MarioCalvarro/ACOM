@@ -53,10 +53,10 @@ def expo(a, B, n):
     beta_val = a
     for p in primes:
         potencia = p
-        beta_val = (beta_val ^ p) % n
+        beta_val = exp_rapida(beta_val, p, n)
         while potencia < n:
             potencia *= p
-            beta_val = (beta_val ^ p) % n
+            beta_val = exp_rapida(beta_val, p, n)
     return beta_val
 
 def pollard_pm1(n, B):

@@ -6,7 +6,7 @@ Comenzamos con la selección de un número aleatorio a entre 2 y n-1, después, 
 la función gcd(a,n), si g es un divisor no trivial entonces hemos terminado. Si no, hay que calcular y = gcd(a^β -1, n) esto nos devuelve y, 
 si y no es un divisor trivial de n, entonces tenemos nuestra solución y hemos terminado. No obstante, no calculamos esto directamente, sino que 
 para ello usamos la función expo(a, B, n), que genera todos los primos hasta B utilizando el algoritmo de la criba de aristóteles (primos_hasta(B)) 
-y con esto, cada primo p, se eleva a a, la potencia de p(con el objetivo de calcular p^(log p N)). Repitiendo esto para potencias de p hasta que 
+y con esto, cada primo p, se eleva a la potencia de p(con el objetivo de calcular p^(log p N)). Repitiendo esto para potencias de p hasta que 
 excedan a n(es decir elevamos p^(log p N) pero sin usar la función log), realizando las operaciones módulo n. 
 '''
 

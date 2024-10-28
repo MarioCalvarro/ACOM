@@ -1,65 +1,127 @@
-def tonelli_shanks(a, p):
-    """Encuentra x tal que x^2 ≡ a (mod p) usando Tonelli-Shanks.
-    Devuelve None si no hay solución."""
-    if pow(a, (p - 1) // 2, p) != 1:
-        return None  # No hay solución
+import random
 
-    if p % 4 == 3:
-        return pow(a, (p + 1) // 4, p)
+def gcd(a, b):
+    """Calcula el máximo común divisor de a y b."""
+    while b:
+        a, b = b, a % b
+    return a
 
-    # Tonelli-Shanks general
-    q = p - 1
-    s = 0
-    while q % 2 == 0:
-        q //= 2
-        s += 1
 
-    z = 2
-    while pow(z, (p - 1) // 2, p) == 1:
-        z += 1
+def jacobi(a, N):
+    """Calcula el símbolo de Jacobi (a|N)."""
+    m = 1
+    while a != 0 and a != 1:
+        if a < 0:
+            if N % 4 == 1:
+                m *= -1
+            a = -a
+        elif a >= N:
+            a = a % N
+        elif a % 2 == 0:
+            if N % 8 in [3, 5]:
+                m *= -1
+            a //= 2
+        else:
+            if a % 4 == 3 and N % 4 == 3:
+                m *= -1
+            a, N = N % a, a
+    return m if a != 0 else 0
 
-    m = s
-    c = pow(z, q, p)
-    t = pow(a, q, p)
-    r = pow(a, (q + 1) // 2, p)
 
-    while t != 1:
-        i = 0
-        temp = t
-        while temp != 1:
-            temp = pow(temp, 2, p)
-            i += 1
-        b = pow(c, 1 << (m - i - 1), p)
-        m = i
-        c = pow(b, 2, p)
-        t = (t * c) % p
-        r = (r * b) % p
+def desc(p):
+    """Descompone p-1 como r * 2^k."""
+    r = p - 1
+    k = 0
+    while r % 2 == 0:
+        k += 1
+        r //= 2
+    return r, k
 
-    return r
 
-def hensel_lift(a, p, n, x0):
-    """Aplica el método de Hensel para levantar la solución de x^2 ≡ a (mod p^n) a (mod p^(n+1))"""
-    x = x0
-    pn = p
-    for i in range(1, n):
-        if (x * x - a) % pn != 0:
-            return None  # No hay solución
-        f_prime = (2 * x) % p
-        if f_prime == 0:
-            return None  # No hay solución
-        x = (x + ((a - x * x) // pn) * pow(f_prime, -1, p)) % (pn * p)
-        pn *= p
+def gen_raiz_prim(p):
+    """Genera una raíz primitiva módulo p."""
+    while True:
+        a = random.randint(2, p - 1)
+        if pow(a, (p - 1) // 2, p) != 1:
+            return a
+
+
+def sqrt_mod1(a, p):
+    """Calcula una raíz cuadrada de a módulo primo p usando el algoritmo de Tonelli-Shanks."""
+    if jacobi(a, p) == -1:
+        return None
+    if jacobi(a, p) == 0:
+        return 0
+    r, k = desc(p)
+    z = pow(a, r, p)
+    x = pow(a, (r + 1) // 2, p)
+    if z == 1:
+        return x
+    g = gen_raiz_prim(p)
+    s = k - 1
+    while s != 0:
+        disc = pow(z, 2 ** (s - 1), p)
+        if disc == p - 1:
+            t = pow(g, r * 2 ** (k - s - 1), p)
+            x = (x * t) % p
+            z = (z * t * t) % p
+        s -= 1
     return x
 
+
+def veces_div_p(a, p):
+    """Cuenta cuántas veces p divide a."""
+    k = 0
+    while a % p == 0:
+        a //= p
+        k += 1
+    return k
+
+
 def sqrt_mod(a, p, n):
-    """Calcula una solución para x^2 ≡ a (mod p^n), donde p es un primo impar y n ≥ 1."""
-    if n == 1:
-        return tonelli_shanks(a, p)
-
-    # Primero encuentra la solución módulo p
-    x0 = tonelli_shanks(a, p)
-    if x0 is None:
+    """Calcula una solución de x^2 ≡ a mod p^n."""
+    x = sqrt_mod1(a, p)
+    if x is None:
         return None
+    if n == 1:
+        return x
+    k = veces_div_p(a, p)
+    b = a // (p ** k)
+    if k != 0:
+        if k % 2 != 0 or jacobi(b, p ** n) != 1:
+            return None
+        y = sqrt_mod(b, p, n)
+        return (y * (p ** (k // 2))) % (p ** n)
+    else:
+        s = 1
+        while s < n:
+            t = ((x ** 2) - a) // (p ** s)
+            inv = pow(-2 * x, -1, p)
+            l = (t * inv) % p
+            x = (x + l * (p ** s)) % (p ** (s + 1))
+            s += 1
+        return x % (p ** n)
 
-    # Aplica el método de Hensel para elevar la solución a módulo p^n
-    return hensel_lift(a, p, n, x0)
+
+# Casos de prueba
+if __name__ == "__main__":
+    # Test 1: sqrt_mod(a, 17, 1) for a in range(17)
+    resultados = [sqrt_mod(a, 17, 1) for a in range(17)]
+    print("Resultados para sqrt_mod(a, 17, 1) con a de 0 a 16:")
+    print(resultados)
+    
+    # Test 2: sqrt_mod(3, 28091881, 1)
+    print("\nsqrt_mod(3, 28091881, 1):")
+    print(sqrt_mod(3, 28091881, 1))
+    
+    # Test 3: sqrt_mod(3, 28091881, 4)
+    print("\nsqrt_mod(3, 28091881, 4):")
+    print(sqrt_mod(3, 28091881, 4))
+    
+    # Test 4: sqrt_mod(167042, 17, 7)
+    print("\nsqrt_mod(167042, 17, 7):")
+    print(sqrt_mod(167042, 17, 7))
+    
+    # Test 5: sqrt_mod(250563, 17, 5)
+    print("\nsqrt_mod(250563, 17, 5):")
+    print(sqrt_mod(250563, 17, 5))  # Debería devolver None

@@ -102,26 +102,3 @@ def sqrt_mod(a, p, n):
             s += 1
         return x % (p ** n)
 
-
-# Casos de prueba
-if __name__ == "__main__":
-    # Test 1: sqrt_mod(a, 17, 1) for a in range(17)
-    resultados = [sqrt_mod(a, 17, 1) for a in range(17)]
-    print("Resultados para sqrt_mod(a, 17, 1) con a de 0 a 16:")
-    print(resultados)
-    
-    # Test 2: sqrt_mod(3, 28091881, 1)
-    print("\nsqrt_mod(3, 28091881, 1):")
-    print(sqrt_mod(3, 28091881, 1))
-    
-    # Test 3: sqrt_mod(3, 28091881, 4)
-    print("\nsqrt_mod(3, 28091881, 4):")
-    print(sqrt_mod(3, 28091881, 4))
-    
-    # Test 4: sqrt_mod(167042, 17, 7)
-    print("\nsqrt_mod(167042, 17, 7):")
-    print(sqrt_mod(167042, 17, 7))
-    
-    # Test 5: sqrt_mod(250563, 17, 5)
-    print("\nsqrt_mod(250563, 17, 5):")
-    print(sqrt_mod(250563, 17, 5))  # Debería devolver None

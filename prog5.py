@@ -7,7 +7,7 @@ La función gen_raiz_prim(p) recibe un número p y se encarga de manera aleatori
 esto lo hacemos aplicando el algoritmo de Tonelli-Shanks. veces_div_p(a,p) nos devuelve cuantas veces p divide a, es decir la multiplicidad de la raíz p para a. Por último, la función sqrt_mod(a,p,n) que usamos a modo de main y se encarga 
 de calcular la solución de x^2 ≡ a (mod p^n). Comenzamos comprobando el símbolo de jacobi para comprobar si existe una raíz cuadrada de a módulo p, si no existe devolvemos None, en caso contrario, continuamos. 
 En caso de que n sea 1, ya tenemos la raíz calculada gracias a sqrt_mod1. Mientras que si n > 1, continuamos. Lo que hacemos es ir aplicando múltiples veces el algoritmo concretamente las k-veces que son devueltas por
-veces_div_p hasta que k sea igual a 0, hacemos vamos aplicando el algoritmo de una manera recursiva. Hasta llegar al caso base, cuando k = 0, en el recorremos n veces el bucle, lo que hacmoes es calcular la raíz cuadrada de un número a módulo p^n.
+veces_div_p hasta que k sea igual a 0. Vamos aplicando el algoritmo de una manera recursiva pero implementado iterativamente. Hasta llegar al caso base, cuando k = 0, en el recorremos n veces el bucle, lo que hacemos es calcular la raíz cuadrada de un número a módulo p^n.
 Esto es necesario para poder extener la solución desde p hasta p^n. Finalmente, devolvemos el valor de la raíz calculada. 
 
 '''

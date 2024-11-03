@@ -105,9 +105,3 @@ def sqrt_mod(a, p, n):
             x = (x + l * (p ** s)) % (p ** (s + 1))
             s += 1
         return x % (p ** n)
-
-print([sqrt_mod(a, 17, 1) for a in range(17)])
-print(sqrt_mod(3, 28091881, 1))
-print(sqrt_mod(3, 28091881, 4))
-print(sqrt_mod(167042, 17, 7))
-print(sqrt_mod(250563, 17, 5))

@@ -14,12 +14,6 @@ Esto es necesario para poder extener la solución desde p hasta p^n. Finalmente,
 
 import random
 
-def gcd(a, b):
-    while b > 0:
-        a, b = b, a % b
-    return a
-
-
 def jacobi(a, N):
     m = 1
     while a != 0 and a != 1:

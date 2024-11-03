@@ -16,8 +16,7 @@ import random
 
 def gcd(a, b):
     while b > 0:
-        a = b
-        b = a % b
+        a, b = b, a % b
     return a
 
 
@@ -31,15 +30,17 @@ def jacobi(a, N):
         elif a >= N:
             a = a % N
         elif a % 2 == 0:
-            if N % 8 in [3, 5]:
+            if N % 8 != 1 and N % 8 != 7:
                 m *= -1
-            a //= 2
+            a = a // 2
         else:
-            if a % 4 == 3 and N % 4 == 3:
+            if N % 4 != 1 and a % 4 != 1:
                 m *= -1
-            a = N % a
-            N = a
-    return m if a != 0 else 0
+            a, N = N, a
+
+    if a == 0:
+        m *= 0
+    return m
 
 
 def desc(p):
@@ -110,10 +111,9 @@ def sqrt_mod(a, p, n):
             x = (x + l * (p ** s)) % (p ** (s + 1))
             s += 1
         return x % (p ** n)
-'''
+
 print([sqrt_mod(a, 17, 1) for a in range(17)])
 print(sqrt_mod(3, 28091881, 1))
 print(sqrt_mod(3, 28091881, 4))
 print(sqrt_mod(167042, 17, 7))
 print(sqrt_mod(250563, 17, 5))
-'''

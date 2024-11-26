@@ -3,15 +3,15 @@ def rotar(f, t):
     if t == 0:
         return f
 
-    l = len(f)
-    res = [0]*l
+    n = len(f)
+    res = [0] * n
 
-    for j in range(l):
-        if j + t >= l or j + t < 0:
+    for i in range(n):
+        if i + t >= n or i + t < 0:
             # [u^n2] = [-1]
-            res[( j + t ) % l] = -f[j]
+            res[( i + t ) % n] = -f[i]
         else:
-            res[( j + t ) % l] = f[j]
+            res[( i + t ) % n] = f[i]
 
     return res
 
@@ -34,8 +34,9 @@ def fft_adaptado(f, xi, p):
     n = len(f)
     if n == 1:
         return f
-    p_even = [0j] * (n//2)
-    p_odd  = [0j] * (n//2)
+
+    p_even = [0] * (n//2)
+    p_odd  = [0] * (n//2)
     for i in range(n//2):
         p_even[i] = f[2*i]
         p_odd[i]  = f[2*i+1]
@@ -49,45 +50,101 @@ def fft_adaptado(f, xi, p):
 
         a[i] = sumar_vectores(a_even[i], rotar_impar, p)
         a[i + n // 2] = restar_vectores(a_even[i], rotar_impar, p)
+
     return a
 
 # Esta función calcula la transformada inversa
 # utilizando que D(xi)^(-1) = 1/n * D(1/xi)
 def ifft_adaptado(a, xi, p):
-    n = len(a)
-    transformado = fft_adaptado(a, 1.0/xi, p)
-    for i in range(n):
-        transformado[i] /= n
+    n1 = len(a[0])
+    n2 = len(a)
+    transformado = fft_adaptado(a, -xi, p)
+    inversa = pow(n2, -1, p)
+
+    for i in range(n2):
+        for j in range(n1):
+            transformado[i][j] = (transformado[i][j] * inversa) % p
+
     return transformado
 
 
 def split(f, k):
     """Divide un polinomio en representación con u y v."""
-    n = len(f)
-    k2 = (k + 1) // 2 # 2
-    k1 = k - k2       # 1
+    k2 = (k + 1) // 2
+    k1 = k - k2
+
     n1 = 2**k1
-    #TODO: Asegurar que los ceros se añaden bien
-    return [[f[i] for i in range(j, j + n1)] for j in range(0, n, n1)]
+    n2 = 2**k2
+    res = []
+    for i in range(0, n2):
+        res += [f[i*n1 : i*n1 + n1] + [0]*n1]
+
+    return res
 
 def join(f_split):
     """Reconstruye un polinomio desde su representación con u y v."""
-    m = len(f_split[0])
-    k = len(f_split) * len(f_split[0])
-    f = [0] * k
-    for i in range(len(f_split)):
-        for j in range(len(f_split[i])):
-            f[i * m + j] = f_split[i][j]
-    return f
+    n2 = len(f_split)
+    n1 = len(f_split[0])//2
 
-def negaconvolucion(f, g, p):
-    return [0]
+    pol = restar_vectores(f_split[0][0:n1], f_split[n2-1][n1:(2*n1)], p)
+    for i in range(0,n2-1):
+        pol   = pol + sumar_vectores(f_split[i][n1:(2*n1)], f_split[i+1][0:n1], p)
 
-def mult_ss_mod(f, g, k, p):
+    return pol
+    # m = len(f_split[0])
+    # k = len(f_split) * len(f_split[0])
+    # f = [0] * k
+    # for i in range(len(f_split)):
+    #     for j in range(len(f_split[i])):
+    #         f[i * m + j] = f_split[i][j]
+    # return f
+
+def negaproducto(f):
+    """Realiza el producto w·f de la negaconvolucion. En este caso, son
+    simplemente rotaciones de los elementos de f"""
+    n1 = len(f[0])
+    n2 = len(f)
+    t = (2*n1) // n2
+    res = [f[0]]
+
+    for i in range (1, n2):
+        res += [rotar(f[i], i*t)]
+
+    return res
+
+def inv_negaproducto(f):
+    """Realiza el producto w·f de la negaconvolucion. En este caso, son
+    simplemente rotaciones inversas de los elementos de f"""
+    n1 = len(f[0])
+    n2 = len(f)
+    t = (2*n1) // n2
+    res = [f[0]]
+
+    for i in range (1, n2):
+        aux = rotar(f[i], -(i*t))
+        res += [aux]
+
+    return res
+
+def negaconvolucion(f, g, k1, p):
+    n1 = len(f[0])
+    n2 = len(f)
+
+    term1 = fft_adaptado(negaproducto(f), (4*n1)//n2, p)
+    term2 = fft_adaptado(negaproducto(g), (4*n1)//n2, p)
+    prod = []
+    for i in range(n2):
+        prod += [mul_ss_pol_mod(term1[i], term2[i], k1 + 1, p)]
+
+    transformado_inv = ifft_adaptado(prod, (4*n1)//n2, p)
+
+    return inv_negaproducto(transformado_inv)
+
+def mul_ss_pol_mod(f, g, k, p):
     if f == [] or g == []:
         return []
 
-    # Casos base:
+    #Casos base:
     if k == 0:
         return [(f[0]*g[0]) % p]
 
@@ -101,10 +158,15 @@ def mult_ss_mod(f, g, k, p):
         a_3 = (f[0]*g[3] + f[1]*g[2] + f[2]*g[1] + f[3]*g[0]) % p
         return [a_0, a_1, a_2, a_3]
 
+
+    k2 = (k + 1) // 2
+    k1 = k - k2
+
     f_class = split(f, k)
     g_class = split(g, k)
 
-    h_class = negaconvolucion(f_class, g_class, p)
+    h_class = negaconvolucion(f_class, g_class, k1, p)
+
     return join(h_class)
 
 def eliminar_ceros(v):
@@ -115,7 +177,7 @@ def eliminar_ceros(v):
     return v
 
 
-def mult_pol_mod(f, g,p):
+def mul_pol_mod(f, g, p):
     if f == [] or g == []:
         return []
 
@@ -129,5 +191,12 @@ def mult_pol_mod(f, g,p):
     f = f + [0]*(2**k - len(f))
     g = g + [0]*(2**k - len(g))
 
-    h = eliminar_ceros(mult_ss_mod(f, g, k, p))
+    h = eliminar_ceros(mul_ss_pol_mod(f, g, k, p))
     return h
+
+primero = [0, 1, 2, 3, 4, 5, 6, 7]
+segundo = [0, 10, 20, 30, 40, 50, 60, 70]
+k = 3
+p = 1009
+
+print(mul_ss_pol_mod(primero, segundo, k, p))

@@ -214,3 +214,10 @@ def mult_pol_mod(f, g,p):
     g = g + [0]*(2**k - len(g))
     h = remover_ceros(mult_ss_mod(f, g, k, p))
     return h
+
+primero = [0, 1, 2, 3, 4, 5, 6, 7]
+segundo = [0, 10, 20, 30, 40, 50, 60, 70]
+k = 3
+p = 1009
+
+mult_ss_mod(primero, segundo, k, p)

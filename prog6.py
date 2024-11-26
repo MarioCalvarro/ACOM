@@ -81,7 +81,7 @@ def split(f, k):
 
     return res
 
-def join(f_split):
+def join(f_split, p):
     """Reconstruye un polinomio desde su representación con u y v."""
     n2 = len(f_split)
     n1 = len(f_split[0])//2
@@ -99,11 +99,9 @@ def join(f_split):
     #         f[i * m + j] = f_split[i][j]
     # return f
 
-def negaproducto(f):
+def negaproducto(f, n1, n2):
     """Realiza el producto w·f de la negaconvolucion. En este caso, son
     simplemente rotaciones de los elementos de f"""
-    n1 = len(f[0])
-    n2 = len(f)
     t = (2*n1) // n2
     res = [f[0]]
 
@@ -112,33 +110,31 @@ def negaproducto(f):
 
     return res
 
-def inv_negaproducto(f):
+def inv_negaproducto(f, n1, n2):
     """Realiza el producto w·f de la negaconvolucion. En este caso, son
     simplemente rotaciones inversas de los elementos de f"""
-    n1 = len(f[0])
-    n2 = len(f)
     t = (2*n1) // n2
     res = [f[0]]
 
     for i in range (1, n2):
-        aux = rotar(f[i], -(i*t))
-        res += [aux]
+        res += [rotar(f[i], -(i*t))]
 
     return res
 
 def negaconvolucion(f, g, k1, p):
-    n1 = len(f[0])
+    n1 = len(f[0])//2       #TODO: Bien?
     n2 = len(f)
 
-    term1 = fft_adaptado(negaproducto(f), (4*n1)//n2, p)
-    term2 = fft_adaptado(negaproducto(g), (4*n1)//n2, p)
+    term1 = fft_adaptado(negaproducto(f, n1, n2), (4*n1)//n2, p)
+    term2 = fft_adaptado(negaproducto(g, n1, n2), (4*n1)//n2, p)
+
     prod = []
     for i in range(n2):
         prod += [mul_ss_pol_mod(term1[i], term2[i], k1 + 1, p)]
 
     transformado_inv = ifft_adaptado(prod, (4*n1)//n2, p)
 
-    return inv_negaproducto(transformado_inv)
+    return inv_negaproducto(transformado_inv, n1, n2)
 
 def mul_ss_pol_mod(f, g, k, p):
     if f == [] or g == []:
@@ -167,7 +163,7 @@ def mul_ss_pol_mod(f, g, k, p):
 
     h_class = negaconvolucion(f_class, g_class, k1, p)
 
-    return join(h_class)
+    return join(h_class, p)
 
 def eliminar_ceros(v):
     n = len(v)
@@ -194,9 +190,3 @@ def mul_pol_mod(f, g, p):
     h = eliminar_ceros(mul_ss_pol_mod(f, g, k, p))
     return h
 
-primero = [0, 1, 2, 3, 4, 5, 6, 7]
-segundo = [0, 10, 20, 30, 40, 50, 60, 70]
-k = 3
-p = 1009
-
-print(mul_ss_pol_mod(primero, segundo, k, p))

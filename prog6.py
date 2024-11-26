@@ -1,4 +1,8 @@
 # Mario Calvarro, Beñat Pérez
+##############
+# Apartado 1 #
+##############
+
 def rotar(f, t):
     if t == 0:
         return f
@@ -190,3 +194,29 @@ def mul_pol_mod(f, g, p):
     h = eliminar_ceros(mul_ss_pol_mod(f, g, k, p))
     return h
 
+##############
+# Apartado 2 #
+##############
+
+def mul_lo_toep_mod(v, a, p, n):
+    aux = mul_pol_mod(v, a, p)
+    return aux[:n]
+
+def mul_hi_toep_mod(v, a, p, n):
+    a_aux = a[::-1]
+    aux = mul_pol_mod(v, a_aux, p)
+    aux_2 = aux[:n]
+    return aux_2[::-1]
+
+def mul_toep_mod(v, w, a, p, n):
+    """Consideramos que w empieza con un 0"""
+    #TODO: Preguntar
+    term1 = mul_lo_toep_mod(v, a, p, n)
+    term2 = mul_hi_toep_mod(w, a, p, n)
+    return sumar_vectores(term1, term2, p)
+
+v = [1, 4, 5]
+w = [0, 2, 3]
+a = [1, 2, 3]
+p = 29
+n = 3

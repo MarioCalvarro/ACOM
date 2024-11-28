@@ -282,7 +282,7 @@ def inv_hi_toep_mod(v, p, n):
         bloque_sup_der = mul_hi_toep_toep_mod(caso_recursivo, vector_tu, p)
         return caso_recursivo + bloque_sup_der[0]
     else:
-        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]    #TODO: Comprobar si es hasta n o n-1
+        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]
     
 
 def inv_lo_toep_mod(v, p, n):
@@ -296,7 +296,7 @@ def inv_lo_toep_mod(v, p, n):
         bloque_sup_der = mul_lo_toep_toep_mod(caso_recursivo, vector_tu, p)
         return caso_recursivo + bloque_sup_der[0]
     else:
-        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]    #TODO: Comprobar si es hasta n o n-1
+        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]
 
 def mul_inv_hi_toep_mod(v, a, p, n):
     inversa_hi = inv_hi_toep_mod(v, p, n)

@@ -215,8 +215,94 @@ def mul_toep_mod(v, w, a, p, n):
     term2 = mul_hi_toep_mod(w, a, p, n)
     return sumar_vectores(term1, term2, p)
 
-v = [1, 4, 5]
-w = [0, 2, 3]
-a = [1, 2, 3]
-p = 29
-n = 3
+##############
+# Apartado 3 #
+##############
+
+#### TODO ####
+def mul_toep_hi_mod(t, u, p):
+    ## TODO: Funciona, pero tal vez tengamos que hacerlo de otra forma
+    sol = []
+    for pol in t:
+        sol += mul_pol_mod(pol, u, p)
+
+    return sol
+
+def mul_hi_toep_toep_mod(u, t, p):
+    ##TODO: 
+    sol = []
+    for pol in t:
+        sol += mul_pol_mod(pol, u, p)
+
+    return sol
+
+def mul_toep_lo_mod(t, u, p):
+    ## TODO: Funciona, pero tal vez tengamos que hacerlo de otra forma
+    sol = []
+    for pol in t:
+        sol += mul_pol_mod(pol, u, p)
+
+    return sol
+
+def mul_lo_toep_toep_mod(u, t, p):
+    ##TODO: 
+    sol = []
+    for pol in t:
+        sol += mul_pol_mod(pol, u, p)
+
+    return sol
+##############
+
+def sacar_matriz(v, w, n):
+    w_prima = w[::-1]
+    sol = [0] * n
+    for i in range(n):
+        aux = [0] * n
+        for j in range(n):
+            if j >= i:
+                # Metemos de v
+                aux[j] = v[j - i]
+            else:
+                # Metemos de w_prima
+                aux[j] = w_prima[i - j - 1]
+
+        sol[i] = aux
+
+    return sol
+
+def inv_hi_toep_mod(v, p, n):
+    if n == 1:
+        return [(1 // v[0]) % p]  # Si v[0] es 0 es porque no es invertible
+    if n == 2:
+        return [(1 // v[0]) % p, (-v[1] // v[0]**2) % p]
+    
+    if n % 2 == 0:
+        caso_recursivo = inv_hi_toep_mod(v[:n//2], p, n//2)
+        vector_tu = mul_toep_hi_mod(sacar_matriz(v[n//2:], v[1:n//2], n//2), caso_recursivo, p)
+        bloque_sup_der = mul_hi_toep_toep_mod(caso_recursivo, vector_tu, p)
+        return caso_recursivo + bloque_sup_der[0]
+    else:
+        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]    #TODO: Comprobar si es hasta n o n-1
+    
+
+def inv_lo_toep_mod(v, p, n):
+    if n == 1:
+        return [(1 // v[0]) % p]  # Si v[0] es 0 es porque no es invertible
+    if n == 2:
+        return [(1 // v[0]) % p, (-v[1] // v[0]**2) % p]
+    if n % 2 == 0:
+        caso_recursivo = inv_lo_toep_mod(v[:n//2], p, n//2)
+        vector_tu = mul_toep_lo_mod(sacar_matriz(v[n//2:0:-1], v[n-1:n//2:-1], n//2), caso_recursivo, p)
+        bloque_sup_der = mul_lo_toep_toep_mod(caso_recursivo, vector_tu, p)
+        return caso_recursivo + bloque_sup_der[0]
+    else:
+        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]    #TODO: Comprobar si es hasta n o n-1
+
+def mul_inv_hi_toep_mod(v, a, p, n):
+    inversa_hi = inv_hi_toep_mod(v, p, n)
+    return mul_hi_toep_mod(inversa_hi, a, p, n)
+
+# Usamos el complemento de Schur para ver que la fórmula es simétrica
+def mul_inv_lo_toep_mod(v, a, p, n):
+    inversa_lo = inv_lo_toep_mod(v, p, n)
+    return mul_lo_toep_mod(inversa_lo, a, p, n)

@@ -283,39 +283,38 @@ def mod_inv(a, p):
         for x in range(1, p):
             if (a * x) % p == 1:
                 return x
- 
+
+# Para realizar esta función, nos apoyamos en el algoritmo de la división
 def divmod_pol_mod(f, g, p):
-    """
-    Realiza la división de folinomios en un anillo Z_p[x] con coeficientes refresentados en orden ascendente.
-    Devolvemos (c, r), donde c es el cociente y r es el resto de la división.
-    """
-    n = len(f) - 1  # Grado de f(x)
-    m = len(g) - 1  # Grado de g(x)
+    deg_f = len(f) - 1 
+    deg_g = len(g) - 1 
+
     f = eliminar_ceros(f)
     g = eliminar_ceros(g)
-    c = [0] * (n - m + 1)   # Inicializamos el cociente
-    r = f                   # Inicializamos el resto con f(x)
+
+    cociente = [0] * (deg_f - deg_g + 1)    # Inicializamos el cociente
+    resto = f                               # Inicializamos el resto con f(x)
 
     # Inverso modular del coeficiente líder de g(x)
     g_lead_inv = mod_inv(g[-1], p)
 
     # Mientras el resto sea mayor
-    while len(r) > m:
+    while len(resto) > deg_g:
         # Grado del término líder del cociente
-        term_deg = len(r) - len(g)
+        term_deg = len(resto) - len(g)
         # Coeficiente del término líder del cociente
-        term_coeff = (r[-1] * g_lead_inv) % p
-        c[term_deg] = term_coeff
+        term_coeff = (resto[-1] * g_lead_inv) % p
+        cociente[term_deg] = term_coeff
         
-        # Restamos term_coeff * g(x) desplazado por term_deg de r(x)
+        # Restamos term_coeff * g(x) desplazado por term_deg de resto(x)
         for i in range(len(g)):
-            r[-(i + 1)] = (r[-(i + 1)] - term_coeff * g[-(i + 1)]) % p
+            resto[-(i + 1)] = (resto[-(i + 1)] - term_coeff * g[-(i + 1)]) % p
         
-        # Eliminamos coeficientes nulos al final del resto
-        while r and r[-1] == 0:
-            r.pop()
+        # Eliminamos coeficientes nulos al final del resto para simplificar el resto
+        while resto[-1] == 0:
+            resto.pop()
     
-    return c, r
+    return cociente, resto
 
 #Casos de prueba para la Parte 4
 print("Caso de prueba 1")

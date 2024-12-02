@@ -277,51 +277,79 @@ print(mul_inv_lo_toep_mod(v, a, p, n))
 # de grado n - m = deg(q) y deg(r) < m. En resuemn, f = q * g + r. 
 # La función divmod_pol_mod(f,g,p) que devuelve q y r
 
-def Divide(f, g, p):
-    GradoDividendo = len(f) - 1
-    GradoDivisor = len(g) - 1
+def mod_inv(a, p):
+        """Calcula el inverso modular de 'a' en Z_p"""
+        a = a % p
+        for x in range(1, p):
+            if (a * x) % p == 1:
+                return x
+ 
+def divmod_pol_mod(f, g, p):
+    """
+    Realiza la división de folinomios en un anillo Z_p[x] con coeficientes refresentados en orden ascendente.
+    Devolvemos (c, r), donde c es el cociente y r es el resto de la división.
+    """
+    n = len(f) - 1  # Grado de f(x)
+    m = len(g) - 1  # Grado de g(x)
+    f = eliminar_ceros(f)
+    g = eliminar_ceros(g)
+    c = [0] * (n - m + 1)   # Inicializamos el cociente
+    r = f                   # Inicializamos el resto con f(x)
 
-    # Caso trivial
-    if GradoDividendo < GradoDivisor:
-        Cociente, Resto = [0], f
+    # Inverso modular del coeficiente líder de g(x)
+    g_lead_inv = mod_inv(g[-1], p)
 
-    # Caso no trivial
-    else:
-        Cociente = []
-        DividendoParcial = f[:]
-        DivisorExtendido = g + [0] * (GradoDividendo - GradoDivisor)
-        GradoDividendoParcial = GradoDividendo
+    # Mientras el resto sea mayor
+    while len(r) > m:
+        # Grado del término líder del cociente
+        term_deg = len(r) - len(g)
+        # Coeficiente del término líder del cociente
+        term_coeff = (r[-1] * g_lead_inv) % p
+        c[term_deg] = term_coeff
+        
+        # Restamos term_coeff * g(x) desplazado por term_deg de r(x)
+        for i in range(len(g)):
+            r[-(i + 1)] = (r[-(i + 1)] - term_coeff * g[-(i + 1)]) % p
+        
+        # Eliminamos coeficientes nulos al final del resto
+        while r and r[-1] == 0:
+            r.pop()
+    
+    return c, r
 
-        # Calculamos el inverso modular del coeficiente líder del divisor para saber que número lo anula
-        InvLiderDivisor = pow(g[0], -1, p) 
-
-        # Realizamos la división en cada paso, hasta que el grado del dividendo parcial sea mayor que el divisor, entonces resto = dividendo parcial
-        while GradoDividendoParcial >= GradoDivisor:
-            Monomio = (DividendoParcial[0] * InvLiderDivisor) % p
-            # Lo guardamos en el cociente
-            Cociente.append(Monomio)
-            # Realizamos la resta presente en la división y ajustamos a Z_p
-            DividendoParcial = [
-                (coef_dividendo - Monomio * coef_divisor) % p for (coef_dividendo, coef_divisor) in
-                zip(DividendoParcial, DivisorExtendido)
-            ]
-            # Quitamos el monomio de mayor grado
-            DividendoParcial.pop(0)
-            DivisorExtendido.pop()
-            GradoDividendoParcial -= 1
-
-        # Hemos terminado la división, nos queda el resto
-        Resto = DividendoParcial
-
-    #Cociente = [c % p for c in Cociente]
-    #Resto = [r % p for r in Resto]
-    return (Cociente, Resto)
-
-
-f = [1000, 1200, 800, 500, 300, 100]  
-g = [700, 0,0]    
-p = 1543
-
-q, r = Divide(f, g, p)
-print("Cociente:", q) 
-print("Resto:", r)  
+#Casos de prueba para la Parte 4
+print("Caso de prueba 1")
+f = [5, 3, 4]
+g = [3]
+p = 5
+print(divmod_pol_mod(f, g, p) == ([0, 1, 3], []))
+print("Caso de prueba 2")
+f = [1, 2, 4, 3]
+g = [1, 2]
+p = 7
+print(divmod_pol_mod(f, g, p) == ([3, 3, 5], [5]))
+print("Caso de prueba 3")
+f = [1, 4, 3, 2]
+g = [1, 1, 1]
+p = 5
+print(divmod_pol_mod(f, g, p) == ([1,2],[0,1]))
+print("Caso de prueba 4")
+f = [1, 2, 3, 4]
+g = [1, 1]
+p = 7
+print(divmod_pol_mod(f, g, p) == ([3,6,4],[5]))
+print("Caso de prueba 5")
+f = [1, 1, 1, 1,1]
+g = [1, 1, 1,1]
+p = 7
+print(divmod_pol_mod(f, g, p) == ([0, 1],[1]))
+print("Caso de prueba 6")
+f = [1, 4, 6]
+g = [1, 2]
+p = 5
+print(divmod_pol_mod(f, g, p) == ([3, 3],[3]))
+print("Caso de prueba 7")
+f = [3, 1]
+g = [1, 2, 4]
+p = 7
+print(divmod_pol_mod(f, g, p) ==([],[3, 1]))

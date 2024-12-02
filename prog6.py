@@ -1,4 +1,4 @@
-# Mario Calvarro, Beñat Pérez
+# Mario Calvarro, Beñat Pérez, Diego Ostos
 ##############
 # Apartado 1 #
 ##############
@@ -268,3 +268,60 @@ a = [52, 123, 65, 127]
 p = 14249
 n = 4
 print(mul_inv_lo_toep_mod(v, a, p, n))
+
+##############
+# Apartado 4 #
+##############
+
+#El objetivo de esta parte es dados dos polinomios f y g pertenenecientes a Z/pZ de grado n y m tal que n >= m, obtenemos la división con resto, donde el cociente es 
+# de grado n - m = deg(q) y deg(r) < m. En resuemn, f = q * g + r. 
+# La función divmod_pol_mod(f,g,p) que devuelve q y r
+
+def Divide(f, g, p):
+    GradoDividendo = len(f) - 1
+    GradoDivisor = len(g) - 1
+
+    # Caso trivial
+    if GradoDividendo < GradoDivisor:
+        Cociente, Resto = [0], f
+
+    # Caso no trivial
+    else:
+        Cociente = []
+        DividendoParcial = f[:]
+        DivisorExtendido = g + [0] * (GradoDividendo - GradoDivisor)
+        GradoDividendoParcial = GradoDividendo
+
+        # Calculamos el inverso modular del coeficiente líder del divisor para saber que número lo anula
+        InvLiderDivisor = pow(g[0], -1, p) 
+
+        # Realizamos la división en cada paso, hasta que el grado del dividendo parcial sea mayor que el divisor, entonces resto = dividendo parcial
+        while GradoDividendoParcial >= GradoDivisor:
+            Monomio = (DividendoParcial[0] * InvLiderDivisor) % p
+            # Lo guardamos en el cociente
+            Cociente.append(Monomio)
+            # Realizamos la resta presente en la división y ajustamos a Z_p
+            DividendoParcial = [
+                (coef_dividendo - Monomio * coef_divisor) % p for (coef_dividendo, coef_divisor) in
+                zip(DividendoParcial, DivisorExtendido)
+            ]
+            # Quitamos el monomio de mayor grado
+            DividendoParcial.pop(0)
+            DivisorExtendido.pop()
+            GradoDividendoParcial -= 1
+
+        # Hemos terminado la división, nos queda el resto
+        Resto = DividendoParcial
+
+    #Cociente = [c % p for c in Cociente]
+    #Resto = [r % p for r in Resto]
+    return (Cociente, Resto)
+
+
+f = [1000, 1200, 800, 500, 300, 100]  
+g = [700, 0,0]    
+p = 1543
+
+q, r = Divide(f, g, p)
+print("Cociente:", q) 
+print("Resto:", r)  

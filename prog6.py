@@ -311,7 +311,7 @@ def divmod_pol_mod(f, g, p):
             resto[-(i + 1)] = (resto[-(i + 1)] - term_coeff * g[-(i + 1)]) % p
         
         # Eliminamos coeficientes nulos al final del resto para simplificar el resto
-        while resto[-1] == 0:
+        while resto and resto[-1] == 0:
             resto.pop()
     
     return cociente, resto

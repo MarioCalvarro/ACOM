@@ -209,100 +209,62 @@ def mul_hi_toep_mod(v, a, p, n):
     return aux_2[::-1]
 
 def mul_toep_mod(v, w, a, p, n):
-    """Consideramos que w empieza con un 0"""
-    #TODO: Preguntar
-    term1 = mul_lo_toep_mod(v, a, p, n)
-    term2 = mul_hi_toep_mod(w, a, p, n)
+    term1 = mul_hi_toep_mod(v, a, p, n)
+    term2 = [0] + (mul_pol_mod(w, a[0:n-1], p))[0:n-1]
     return sumar_vectores(term1, term2, p)
 
 ##############
 # Apartado 3 #
 ##############
 
-#### TODO ####
-def mul_toep_hi_mod(t, u, p):
-    ## TODO: Funciona, pero tal vez tengamos que hacerlo de otra forma
-    sol = []
-    for pol in t:
-        sol += mul_pol_mod(pol, u, p)
-
-    return sol
-
-def mul_hi_toep_toep_mod(u, t, p):
-    ##TODO: 
-    sol = []
-    for pol in t:
-        sol += mul_pol_mod(pol, u, p)
-
-    return sol
-
-def mul_toep_lo_mod(t, u, p):
-    ## TODO: Funciona, pero tal vez tengamos que hacerlo de otra forma
-    sol = []
-    for pol in t:
-        sol += mul_pol_mod(pol, u, p)
-
-    return sol
-
-def mul_lo_toep_toep_mod(u, t, p):
-    ##TODO: 
-    sol = []
-    for pol in t:
-        sol += mul_pol_mod(pol, u, p)
-
-    return sol
-##############
-
-def sacar_matriz(v, w, n):
-    w_prima = w[::-1]
-    sol = [0] * n
-    for i in range(n):
-        aux = [0] * n
-        for j in range(n):
-            if j >= i:
-                # Metemos de v
-                aux[j] = v[j - i]
-            else:
-                # Metemos de w_prima
-                aux[j] = w_prima[i - j - 1]
-
-        sol[i] = aux
-
-    return sol
-
-def inv_hi_toep_mod(v, p, n):
-    if n == 1:
-        return [(1 // v[0]) % p]  # Si v[0] es 0 es porque no es invertible
-    if n == 2:
-        return [(1 // v[0]) % p, (-v[1] // v[0]**2) % p]
-    
-    if n % 2 == 0:
-        caso_recursivo = inv_hi_toep_mod(v[:n//2], p, n//2)
-        vector_tu = mul_toep_hi_mod(sacar_matriz(v[n//2:], v[1:n//2], n//2), caso_recursivo, p)
-        bloque_sup_der = mul_hi_toep_toep_mod(caso_recursivo, vector_tu, p)
-        return caso_recursivo + bloque_sup_der[0]
-    else:
-        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]
-    
-
-def inv_lo_toep_mod(v, p, n):
-    if n == 1:
-        return [(1 // v[0]) % p]  # Si v[0] es 0 es porque no es invertible
-    if n == 2:
-        return [(1 // v[0]) % p, (-v[1] // v[0]**2) % p]
-    if n % 2 == 0:
-        caso_recursivo = inv_lo_toep_mod(v[:n//2], p, n//2)
-        vector_tu = mul_toep_lo_mod(sacar_matriz(v[n//2:0:-1], v[n-1:n//2:-1], n//2), caso_recursivo, p)
-        bloque_sup_der = mul_lo_toep_toep_mod(caso_recursivo, vector_tu, p)
-        return caso_recursivo + bloque_sup_der[0]
-    else:
-        return (inv_hi_toep_mod(v + [0], p, n + 1))[:n]
-
 def mul_inv_hi_toep_mod(v, a, p, n):
-    inversa_hi = inv_hi_toep_mod(v, p, n)
-    return mul_hi_toep_mod(inversa_hi, a, p, n)
+    if n == 1:
+        inverso = pow(v[0], -1, p)
+        return [(inverso * a[0]) % p]
+    elif n == 2:
+        inverso = pow(v[0], -1, p)
+        return [(inverso * a[0] - v[1] * pow(inverso, 2, p) * a[1]) % p,
+                (inverso * a[1]) % p]
+
+    if n % 2 == 0:
+        t1 = v[n//2:n]
+        t2 = v[n//2-1:0:-1]
+        mul_uinv_a1 = mul_inv_hi_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
+        mul_uinv_a2 = mul_inv_hi_toep_mod(v[0:n//2], a[n//2:n], p, n//2) 
+
+        mul_t = mul_toep_mod(t1, t2, mul_uinv_a2, p, n//2)
+
+        mul_uinv_t_a2 = mul_inv_hi_toep_mod(v[0:n//2], mul_t, p, n//2)
+        return restar_vectores(mul_uinv_a1, mul_uinv_t_a2, p) + mul_uinv_a2
+    else:
+        return (mul_inv_hi_toep_mod(v + [0], a + [0], p, n + 1))[0:n]
 
 # Usamos el complemento de Schur para ver que la fórmula es simétrica
 def mul_inv_lo_toep_mod(v, a, p, n):
-    inversa_lo = inv_lo_toep_mod(v, p, n)
-    return mul_lo_toep_mod(inversa_lo, a, p, n)
+    if n == 1:
+        inverso = pow(v[0], -1, p)
+        return [(inverso * a[0]) % p]
+    elif n == 2:
+        inverso = pow(v[0], -1, p)
+        return [(inverso * a[0]) % p,
+                (inverso * a[1] - v[1] * pow(inverso, 2, p) * a[0]) % p]
+
+    if n % 2 == 0:
+        t1 = v[n//2:0:-1]
+        t2 = v[n//2+1:n]
+        mul_linv_a1 = mul_inv_lo_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
+        mul_linv_a2 = mul_inv_lo_toep_mod(v[0:n//2], a[n//2:n], p, n//2) 
+
+        # TODO: Esto no funciona ahora mismo por los impares
+        mul_t = mul_toep_mod(t1, t2, mul_linv_a1, p, n//2)
+
+        mul_linv_t_a2 = mul_inv_lo_toep_mod(v[0:n//2], mul_t, p, n//2)
+        return restar_vectores(mul_linv_a1, mul_linv_t_a2, p) + mul_linv_a2
+    else:
+        return (mul_inv_lo_toep_mod(v + [0], a + [0], p, n + 1))[0:n]
+
+v = [13, 34, 42, 38]
+a = [52, 123, 65, 127]
+p = 14249
+n = 4
+print(mul_inv_lo_toep_mod(v, a, p, n))

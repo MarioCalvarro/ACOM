@@ -193,20 +193,30 @@ def mul_pol_mod(f, g, p):
 
 def mul_lo_toep_mod(v, a, p, n):
     aux = mul_pol_mod(v, a, p)
+
+    if len(aux) < n:
+        aux += [0] * (n - len(aux))
+
     return aux[:n]
 
 def mul_hi_toep_mod(v, a, p, n):
     a_aux = a[::-1]
     aux = mul_pol_mod(v, a_aux, p)
     aux_2 = aux[:n]
+
+    if len(aux_2) < n:
+        aux_2 += [0] * (n - len(aux_2))
+
     return aux_2[::-1]
 
 def mul_toep_mod(v, w, a, p, n):
     term1 = mul_hi_toep_mod(v, a, p, n)
     term2 = [0] + (mul_pol_mod(w, a[0:n-1], p))[0:n-1]
     
-    if len(term2) < len(term1):
-        term2 += [0] * (len(term1) - len(term2))
+    if len(term1) < n:
+        term1 += [0] * (n - len(term1))
+    if len(term2) < n:
+        term2 += [0] * (n - len(term2))
 
     return sumar_vectores(term1, term2, p)
 
@@ -259,92 +269,34 @@ def mul_inv_lo_toep_mod(v, a, p, n):
     else:
         return (mul_inv_lo_toep_mod(v + [0], a + [0], p, n + 1))[0:n]
 
-v = [13, 34, 42, 38, 83]
-a = [52, 123, 65, 127, 17]
-p = 14249
-n = 5
-print(mul_inv_lo_toep_mod(v, a, p, n))
-
 ##############
 # Apartado 4 #
 ##############
 
 # El objetivo de esta parte es dados dos polinomios f y g pertenenecientes a Z/pZ de grado n y m tal que n >= m, obtenemos la división con resto, donde el cociente es
-# de grado n - m = deg(q) y deg(r) < m. En resuemn, f = q * g + r.
+# de grado n - m = deg(q) y deg(r) < m. En resumen, f = q * g + r.
 # La función divmod_pol_mod(f,g,p) que devuelve q y r
-
-def mod_inv(a, p):
-        """Calcula el inverso modular de 'a' en Z_p"""
-        a = a % p
-        for x in range(1, p):
-            if (a * x) % p == 1:
-                return x
-
-# Para realizar esta función, nos apoyamos en el algoritmo de la división
 def divmod_pol_mod(f, g, p):
-    deg_f = len(f) - 1
-    deg_g = len(g) - 1
+    n = len(f) - 1
+    m = len(g) - 1
+    # Caso deg(f) < deg(g)
+    if n < m:
+        return [], f
 
-    f = eliminar_ceros(f)
-    g = eliminar_ceros(g)
 
-    cociente = [0] * (deg_f - deg_g + 1)    # Inicializamos el cociente
-    resto = f                               # Inicializamos el resto con f(x)
+    final_g = max(-1, 2*m - n - 2)
+    matriz_u = []
+    if final_g == -1:
+        matriz_u = g[m::-1]
+        matriz_u += [0] * (n - m + 1 - len(matriz_u))
+    else:
+        matriz_u = g[m:final_g:-1]
 
-    # Inverso modular del coeficiente líder de g(x)
-    g_lead_inv = mod_inv(g[-1], p)
+    vect_f = f[m:n+1]
+    
+    vect_q = eliminar_ceros(mul_inv_hi_toep_mod(matriz_u, vect_f, p, n - m + 1))
 
-    # Mientras el resto sea mayor
-    while len(resto) > deg_g:
-        # Grado del término líder del cociente
-        term_deg = len(resto) - len(g)
-        # Coeficiente del término líder del cociente
-        term_coeff = (resto[-1] * g_lead_inv) % p
-        cociente[term_deg] = term_coeff
+    vect_r = eliminar_ceros(restar_vectores(f, mul_pol_mod(vect_q, g, p), p))
 
-        # Restamos term_coeff * g(x) desplazado por term_deg de resto(x)
-        for i in range(len(g)):
-            resto[-(i + 1)] = (resto[-(i + 1)] - term_coeff * g[-(i + 1)]) % p
+    return vect_q, vect_r
 
-        # Eliminamos coeficientes nulos al final del resto para simplificar el resto
-        while resto and resto[-1] == 0:
-            resto.pop()
-
-    return cociente, resto
-#
-# #Casos de prueba para la Parte 4
-# print("Caso de prueba 1")
-# f = [5, 3, 4]
-# g = [3]
-# p = 5
-# print(divmod_pol_mod(f, g, p) == ([0, 1, 3], []))
-# print("Caso de prueba 2")
-# f = [1, 2, 4, 3]
-# g = [1, 2]
-# p = 7
-# print(divmod_pol_mod(f, g, p) == ([3, 3, 5], [5]))
-# print("Caso de prueba 3")
-# f = [1, 4, 3, 2]
-# g = [1, 1, 1]
-# p = 5
-# print(divmod_pol_mod(f, g, p) == ([1,2],[0,1]))
-# print("Caso de prueba 4")
-# f = [1, 2, 3, 4]
-# g = [1, 1]
-# p = 7
-# print(divmod_pol_mod(f, g, p) == ([3,6,4],[5]))
-# print("Caso de prueba 5")
-# f = [1, 1, 1, 1,1]
-# g = [1, 1, 1,1]
-# p = 7
-# print(divmod_pol_mod(f, g, p) == ([0, 1],[1]))
-# print("Caso de prueba 6")
-# f = [1, 4, 6]
-# g = [1, 2]
-# p = 5
-# print(divmod_pol_mod(f, g, p) == ([3, 3],[3]))
-# print("Caso de prueba 7")
-# f = [3, 1]
-# g = [1, 2, 4]
-# p = 7
-# print(divmod_pol_mod(f, g, p) ==([],[3, 1]))

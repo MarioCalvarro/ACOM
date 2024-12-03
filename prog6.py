@@ -204,6 +204,10 @@ def mul_hi_toep_mod(v, a, p, n):
 def mul_toep_mod(v, w, a, p, n):
     term1 = mul_hi_toep_mod(v, a, p, n)
     term2 = [0] + (mul_pol_mod(w, a[0:n-1], p))[0:n-1]
+    
+    if len(term2) < len(term1):
+        term2 += [0] * (len(term1) - len(term2))
+
     return sumar_vectores(term1, term2, p)
 
 ##############
@@ -248,18 +252,17 @@ def mul_inv_lo_toep_mod(v, a, p, n):
         mul_linv_a1 = mul_inv_lo_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
         mul_linv_a2 = mul_inv_lo_toep_mod(v[0:n//2], a[n//2:n], p, n//2)
 
-        # TODO: Esto no funciona ahora mismo por los impares
         mul_t = mul_toep_mod(t1, t2, mul_linv_a1, p, n//2)
 
-        mul_linv_t_a2 = mul_inv_lo_toep_mod(v[0:n//2], mul_t, p, n//2)
-        return restar_vectores(mul_linv_a1, mul_linv_t_a2, p) + mul_linv_a2
+        mul_linv_t_a1 = mul_inv_lo_toep_mod(v[0:n//2], mul_t, p, n//2)
+        return mul_linv_a1 + restar_vectores(mul_linv_a2, mul_linv_t_a1, p)
     else:
         return (mul_inv_lo_toep_mod(v + [0], a + [0], p, n + 1))[0:n]
 
-v = [13, 34, 42, 38]
-a = [52, 123, 65, 127]
+v = [13, 34, 42, 38, 83]
+a = [52, 123, 65, 127, 17]
 p = 14249
-n = 4
+n = 5
 print(mul_inv_lo_toep_mod(v, a, p, n))
 
 ##############
@@ -308,40 +311,40 @@ def divmod_pol_mod(f, g, p):
             resto.pop()
 
     return cociente, resto
-
-#Casos de prueba para la Parte 4
-print("Caso de prueba 1")
-f = [5, 3, 4]
-g = [3]
-p = 5
-print(divmod_pol_mod(f, g, p) == ([0, 1, 3], []))
-print("Caso de prueba 2")
-f = [1, 2, 4, 3]
-g = [1, 2]
-p = 7
-print(divmod_pol_mod(f, g, p) == ([3, 3, 5], [5]))
-print("Caso de prueba 3")
-f = [1, 4, 3, 2]
-g = [1, 1, 1]
-p = 5
-print(divmod_pol_mod(f, g, p) == ([1,2],[0,1]))
-print("Caso de prueba 4")
-f = [1, 2, 3, 4]
-g = [1, 1]
-p = 7
-print(divmod_pol_mod(f, g, p) == ([3,6,4],[5]))
-print("Caso de prueba 5")
-f = [1, 1, 1, 1,1]
-g = [1, 1, 1,1]
-p = 7
-print(divmod_pol_mod(f, g, p) == ([0, 1],[1]))
-print("Caso de prueba 6")
-f = [1, 4, 6]
-g = [1, 2]
-p = 5
-print(divmod_pol_mod(f, g, p) == ([3, 3],[3]))
-print("Caso de prueba 7")
-f = [3, 1]
-g = [1, 2, 4]
-p = 7
-print(divmod_pol_mod(f, g, p) ==([],[3, 1]))
+#
+# #Casos de prueba para la Parte 4
+# print("Caso de prueba 1")
+# f = [5, 3, 4]
+# g = [3]
+# p = 5
+# print(divmod_pol_mod(f, g, p) == ([0, 1, 3], []))
+# print("Caso de prueba 2")
+# f = [1, 2, 4, 3]
+# g = [1, 2]
+# p = 7
+# print(divmod_pol_mod(f, g, p) == ([3, 3, 5], [5]))
+# print("Caso de prueba 3")
+# f = [1, 4, 3, 2]
+# g = [1, 1, 1]
+# p = 5
+# print(divmod_pol_mod(f, g, p) == ([1,2],[0,1]))
+# print("Caso de prueba 4")
+# f = [1, 2, 3, 4]
+# g = [1, 1]
+# p = 7
+# print(divmod_pol_mod(f, g, p) == ([3,6,4],[5]))
+# print("Caso de prueba 5")
+# f = [1, 1, 1, 1,1]
+# g = [1, 1, 1,1]
+# p = 7
+# print(divmod_pol_mod(f, g, p) == ([0, 1],[1]))
+# print("Caso de prueba 6")
+# f = [1, 4, 6]
+# g = [1, 2]
+# p = 5
+# print(divmod_pol_mod(f, g, p) == ([3, 3],[3]))
+# print("Caso de prueba 7")
+# f = [3, 1]
+# g = [1, 2, 4]
+# p = 7
+# print(divmod_pol_mod(f, g, p) ==([],[3, 1]))

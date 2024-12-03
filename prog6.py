@@ -284,6 +284,7 @@ def divmod_pol_mod(f, g, p):
         return [], f
 
 
+    # Caso deg(f) >= deg(g)
     final_g = max(-1, 2*m - n - 2)
     matriz_u = []
     if final_g == -1:

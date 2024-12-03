@@ -95,13 +95,6 @@ def join(f_split, p):
         pol   = pol + sumar_vectores(f_split[i][n1:(2*n1)], f_split[i+1][0:n1], p)
 
     return pol
-    # m = len(f_split[0])
-    # k = len(f_split) * len(f_split[0])
-    # f = [0] * k
-    # for i in range(len(f_split)):
-    #     for j in range(len(f_split[i])):
-    #         f[i * m + j] = f_split[i][j]
-    # return f
 
 def negaproducto(f, n1, n2):
     """Realiza el producto w·f de la negaconvolucion. En este caso, son
@@ -126,7 +119,7 @@ def inv_negaproducto(f, n1, n2):
     return res
 
 def negaconvolucion(f, g, k1, p):
-    n1 = len(f[0])//2       #TODO: Bien?
+    n1 = len(f[0])//2
     n2 = len(f)
 
     term1 = fft_adaptado(negaproducto(f, n1, n2), (4*n1)//n2, p)
@@ -230,7 +223,7 @@ def mul_inv_hi_toep_mod(v, a, p, n):
         t1 = v[n//2:n]
         t2 = v[n//2-1:0:-1]
         mul_uinv_a1 = mul_inv_hi_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
-        mul_uinv_a2 = mul_inv_hi_toep_mod(v[0:n//2], a[n//2:n], p, n//2) 
+        mul_uinv_a2 = mul_inv_hi_toep_mod(v[0:n//2], a[n//2:n], p, n//2)
 
         mul_t = mul_toep_mod(t1, t2, mul_uinv_a2, p, n//2)
 
@@ -253,7 +246,7 @@ def mul_inv_lo_toep_mod(v, a, p, n):
         t1 = v[n//2:0:-1]
         t2 = v[n//2+1:n]
         mul_linv_a1 = mul_inv_lo_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
-        mul_linv_a2 = mul_inv_lo_toep_mod(v[0:n//2], a[n//2:n], p, n//2) 
+        mul_linv_a2 = mul_inv_lo_toep_mod(v[0:n//2], a[n//2:n], p, n//2)
 
         # TODO: Esto no funciona ahora mismo por los impares
         mul_t = mul_toep_mod(t1, t2, mul_linv_a1, p, n//2)
@@ -273,8 +266,8 @@ print(mul_inv_lo_toep_mod(v, a, p, n))
 # Apartado 4 #
 ##############
 
-#El objetivo de esta parte es dados dos polinomios f y g pertenenecientes a Z/pZ de grado n y m tal que n >= m, obtenemos la división con resto, donde el cociente es 
-# de grado n - m = deg(q) y deg(r) < m. En resuemn, f = q * g + r. 
+# El objetivo de esta parte es dados dos polinomios f y g pertenenecientes a Z/pZ de grado n y m tal que n >= m, obtenemos la división con resto, donde el cociente es
+# de grado n - m = deg(q) y deg(r) < m. En resuemn, f = q * g + r.
 # La función divmod_pol_mod(f,g,p) que devuelve q y r
 
 def mod_inv(a, p):
@@ -286,8 +279,8 @@ def mod_inv(a, p):
 
 # Para realizar esta función, nos apoyamos en el algoritmo de la división
 def divmod_pol_mod(f, g, p):
-    deg_f = len(f) - 1 
-    deg_g = len(g) - 1 
+    deg_f = len(f) - 1
+    deg_g = len(g) - 1
 
     f = eliminar_ceros(f)
     g = eliminar_ceros(g)
@@ -305,15 +298,15 @@ def divmod_pol_mod(f, g, p):
         # Coeficiente del término líder del cociente
         term_coeff = (resto[-1] * g_lead_inv) % p
         cociente[term_deg] = term_coeff
-        
+
         # Restamos term_coeff * g(x) desplazado por term_deg de resto(x)
         for i in range(len(g)):
             resto[-(i + 1)] = (resto[-(i + 1)] - term_coeff * g[-(i + 1)]) % p
-        
+
         # Eliminamos coeficientes nulos al final del resto para simplificar el resto
         while resto and resto[-1] == 0:
             resto.pop()
-    
+
     return cociente, resto
 
 #Casos de prueba para la Parte 4

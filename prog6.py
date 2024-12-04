@@ -374,7 +374,7 @@ def divmod_pol_mod(f, g, p):
     else:
         matriz_u = g[m:final_g:-1]
 
-    vect_f = f[m:n+1]
+    vect_f = f[m:]
 
     vect_q = eliminar_ceros(mul_inv_hi_toep_mod(matriz_u, vect_f, p, n - m + 1))
 

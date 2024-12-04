@@ -4,10 +4,10 @@
 ##############
 '''
 En este apartado, debemos implementar dos funciones mul_pol_mod(f,g,p) y mul_ss_pol_mod(f,g,k,p). La primera función recibe f y g que son polinomios pertenecientes a
-(Z/pZ)[x] nos devuelve el polinomio fruto del producto entre f y g. Para la implementación de esta primera función nos hemos apoyado en la segunda función definida 
+(Z/pZ)[x] nos devuelve el polinomio fruto del producto entre f y g. Para la implementación de esta primera función nos hemos apoyado en la segunda función definida
 a continuación. La segunda función realiza el producto de los polinomios f y g en el anillo (Z/pZ)[x](x^(s^k) + 1), devolviendo un resultado respresentado por sus 2^k coeficientes
-en orden creciente de grado del monomio. Dividimos los polinomios en representación con u y v mediante la función split. Aplicamos el algoritmo de Cooley-Tuckey para calcular DFT_n, 
-transformando así los bloques. Realizamosel producto en el dominio transformado y posteriormente, se usa la transformanda inversa para volver al dominio original. Finalmente, 
+en orden creciente de grado del monomio. Dividimos los polinomios en representación con u y v mediante la función split. Aplicamos el algoritmo de Cooley-Tuckey para calcular DFT_n,
+transformando así los bloques. Realizamosel producto en el dominio transformado y posteriormente, se usa la transformanda inversa para volver al dominio original. Finalmente,
 unimos los distintos bloques mediante la función join.
 '''
 def rotar(f, t):
@@ -45,7 +45,7 @@ def restar_vectores(f, g, p):
     for i in range(len(f)):
         h += [(f[i] - g[i]) % p]
     return h
- 
+
 def fft_adaptado(f, xi, p):
     """
     Algoritmo de Cooley-Tuckey para calcular DFT_n(p) donde n = len(p) debe ser una potencia de 2 y xi debe ser una raíz n-ésima primitiva de la unidad
@@ -143,7 +143,7 @@ def inv_negaproducto(f, n1, n2):
 
 def negaconvolucion(f, g, k1, p):
     """
-    Recibe dos polinomios f y g, un entero k1 y el módulo del espacio en el que estamos. La usamos para realizar la multiplicación eficiente de los polinomios diviendolos en bloques. 
+    Recibe dos polinomios f y g, un entero k1 y el módulo del espacio en el que estamos. La usamos para realizar la multiplicación eficiente de los polinomios diviendolos en bloques.
     """
     n1 = len(f[0])//2
     n2 = len(f)
@@ -205,8 +205,8 @@ def eliminar_ceros(v):
 def mul_pol_mod(f, g, p):
     """
     Recibe dos polinomios f y g en módulo p
-    Devuelve como resultado el polinomio producto de la multiplicación de ambos polinomios aplicando la función mul_ss_pol_mod en k, obtenida por medio 
-    de dividir m entre dos hasta que sea cero, "cuantas veces" sea m divisible por 2. 
+    Devuelve como resultado el polinomio producto de la multiplicación de ambos polinomios aplicando la función mul_ss_pol_mod en k, obtenida por medio
+    de dividir m entre dos hasta que sea cero, "cuantas veces" sea m divisible por 2.
     """
     if f == [] or g == []:
         return []
@@ -233,7 +233,7 @@ El objetivo de este apartado es realizar la implementación de tres funciones (e
 
 def mul_lo_toep_mod(v, a, p, n):
     """
-    Calcula el producto de L(v) * a, donde L(v) es una matriz de Toeplitz inferior cuya primera columna es v y a es un vector. 
+    Calcula el producto de L(v) * a, donde L(v) es una matriz de Toeplitz inferior cuya primera columna es v y a es un vector.
     Esto se obtiene multiplicando el polinomio v por a y rellenando con ceros hasta obtener un tamaño n.
     """
     aux = mul_pol_mod(v, a, p)
@@ -245,8 +245,8 @@ def mul_lo_toep_mod(v, a, p, n):
 
 def mul_hi_toep_mod(v, a, p, n):
     """
-    Calcula el producto de U(v) * a, donde U(v) es una matriz de Toeplitz superior cuya primera fila es v y el vector a. 
-    Para realizar esto invertimos el orden de a, realizamos la multiplicación con el polinomio v y finalmente, tomamos los n primeros coeficientes. 
+    Calcula el producto de U(v) * a, donde U(v) es una matriz de Toeplitz superior cuya primera fila es v y el vector a.
+    Para realizar esto invertimos el orden de a, realizamos la multiplicación con el polinomio v y finalmente, tomamos los n primeros coeficientes.
     En caso de que nos quede un polinomio de grado menor que n, rellenamos con ceros
     """
     a_aux = a[::-1]
@@ -265,7 +265,7 @@ def mul_toep_mod(v, w, a, p, n):
     """
     term1 = mul_hi_toep_mod(v, a, p, n)
     term2 = [0] + (mul_pol_mod(w, a[0:n-1], p))[0:n-1]
-    
+
     if len(term1) < n:
         term1 += [0] * (n - len(term1))
     if len(term2) < n:
@@ -281,11 +281,11 @@ El objetivo de este apartado es calcular dos funciones, comentadas a continuaci�
 """
 def mul_inv_hi_toep_mod(v, a, p, n):
     """
-    Calcula el producto U^-1(v) * a, donde U(v) es una matriz de Toeplitz superior cuya cuya primera fila es v y el vector a. 
-    Casos base: 
+    Calcula el producto U^-1(v) * a, donde U(v) es una matriz de Toeplitz superior cuya cuya primera fila es v y el vector a.
+    Casos base:
         Si n = 1: devolvemos producto del inverso v[0] y a[0]
-        Si n = 2: aplicamos el inverso a ambos términos del resultado. 
-    Caso recusivo: 
+        Si n = 2: aplicamos el inverso a ambos términos del resultado.
+    Caso recusivo:
         Dividimos v y a en dos mitades, resolvemos de manera recursiva los productos con las submatrices superiores de menor tamaño. Nos apoyamos en la función mul_toep_mod para obtener los resultados.
         Finalmente, unimos los resultados para obtener los resultados.
     Si n no es par, extendemos v y a con ceros.
@@ -314,13 +314,13 @@ def mul_inv_hi_toep_mod(v, a, p, n):
 def mul_inv_lo_toep_mod(v, a, p, n):
     """
     Calculamos L^-1(v) * a, donde L(v) es la matriz de Toeplitz inferiro cuya primera columna es v y el vector a. Usamos el complemento de Schur para ver que la fórmula es simétrica
-    Casos base: 
+    Casos base:
         Si n = 1: devolvemos producto del inverso v[0] y a[0]
         Si n = 2: aplicamos el inverso a ambos términos del resultado.
-    Caso recusrivo: 
+    Caso recusrivo:
         Dividimos v y a en dos submatrices, así calculamos recursivamente las submatrices inferiores de menor tamaño. Nos apoyamos en la función mul_toep_mod para obtener los resultados.
         Finalmente, unimos los resultados para obtener los resultados.
-    Si n no es par, extendemos v y a con ceros. 
+    Si n no es par, extendemos v y a con ceros.
     """
     if n == 1:
         inverso = pow(v[0], -1, p)
@@ -353,10 +353,10 @@ La función divmod_pol_mod(f,g,p) que devuelve q y r
 """
 def divmod_pol_mod(f, g, p):
     """
-    Calcula la división de dos polinomios f y g en un cuerpo Z/pZ, devolviendo el cociente y el resto de la división bajo módulo p. 
+    Calcula la división de dos polinomios f y g en un cuerpo Z/pZ, devolviendo el cociente y el resto de la división bajo módulo p.
     Si el grado de f es menor que el grado de g, devolvemos [] y f.
     Si el grado de f es mayor o igual que el grado de g, utilizamos las matrices de Toeplitz superiores para resolver el sistema lineal asociado a la división y calculando así el cociente mediante la función
-    mul_inv_hi_toep_mod. Para calcular el resto, aplicamos la función restar vectores con f y el resultado de multiplicar el cociente por el divisor. 
+    mul_inv_hi_toep_mod. Para calcular el resto, aplicamos la función restar vectores con f y el resultado de multiplicar el cociente por el divisor.
     En ambos calculos, finalizamos con la eliminación de los ceros innecesarios.
     """
     n = len(f) - 1
@@ -375,7 +375,7 @@ def divmod_pol_mod(f, g, p):
         matriz_u = g[m:final_g:-1]
 
     vect_f = f[m:n+1]
-    
+
     vect_q = eliminar_ceros(mul_inv_hi_toep_mod(matriz_u, vect_f, p, n - m + 1))
 
     vect_r = eliminar_ceros(restar_vectores(f, mul_pol_mod(vect_q, g, p), p))

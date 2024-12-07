@@ -7,7 +7,7 @@ En este apartado, debemos implementar dos funciones mul_pol_mod(f,g,p) y mul_ss_
 (Z/pZ)[x] nos devuelve el polinomio fruto del producto entre f y g. Para la implementación de esta primera función nos hemos apoyado en la segunda función definida
 a continuación. La segunda función realiza el producto de los polinomios f y g en el anillo (Z/pZ)[x](x^(s^k) + 1), devolviendo un resultado respresentado por sus 2^k coeficientes
 en orden creciente de grado del monomio. Dividimos los polinomios en representación con u y v mediante la función split. Aplicamos el algoritmo de Cooley-Tuckey para calcular DFT_n,
-transformando así los bloques. Realizamosel producto en el dominio transformado y posteriormente, se usa la transformanda inversa para volver al dominio original. Finalmente,
+transformando así los bloques. Realizamos el producto en el dominio transformado y posteriormente, se usa la transformanda inversa para volver al dominio original. Finalmente,
 unimos los distintos bloques mediante la función join.
 '''
 def rotar(f, t):

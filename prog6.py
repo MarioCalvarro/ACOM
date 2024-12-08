@@ -338,7 +338,7 @@ def mul_inv_lo_toep_mod(v, a, p, n):
         #t1 = v[n//2:0:-1]
         #t2 = v[n//2+1:n]
         t1 = v[n//2:n]
-        t2 = v[n//2:0:-1]
+        t2 = v[n//2-1:0:-1]
         mul_linv_a1 = mul_inv_lo_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
         mul_linv_a2 = mul_inv_lo_toep_mod(v[0:n//2], a[n//2:n], p, n//2)
 

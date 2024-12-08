@@ -218,11 +218,10 @@ def mul_pol_mod(f, g, p):
         k += 1
 
     # Añadimos los ceros necesarios
-    f = f + [0]*(2**k - len(f))
-    g = g + [0]*(2**k - len(g))
+    f = f + [0] * (2**k - len(f))
+    g = g + [0] * (2**k - len(g))
 
-    h = eliminar_ceros(mul_ss_pol_mod(f, g, k, p))
-    return h
+    return eliminar_ceros(mul_ss_pol_mod(f, g, k, p))
 
 ##############
 # Apartado 2 #
@@ -260,11 +259,9 @@ def mul_hi_toep_mod(v, a, p, n):
 
 def mul_toep_mod(v, w, a, p, n):
     """
-    Calcula el producto de T(v,w) * a, donde T(v,w) es una matriz de Toeplitz general cuya primera columna es v y su primera filaes w
+    Calcula el producto de T(v,w) * a, donde T(v,w) es una matriz de Toeplitz general cuya primera columna es v y su primera fila es w
     Para realizar esto, calculamos U(v) * a y L(w) * a, rellenemos con ceros hasta que ambas tenga mismo grado n. Y terminamos sumando ambos términos.
     """
-    #term1 = mul_hi_toep_mod(v, a, p, n)
-    #term2 = [0] + (mul_pol_mod(w, a[0:n-1], p))[0:n-1]
     term1 = mul_hi_toep_mod(w, a[1:n], p, n-1)
     term2 = mul_lo_toep_mod(v, a, p, n)
 
@@ -301,8 +298,6 @@ def mul_inv_hi_toep_mod(v, a, p, n):
                 (inverso * a[1]) % p]
 
     if n % 2 == 0:
-        #t1 = v[n//2:n]
-        #t2 = v[n//2-1:0:-1]
         t1 = v[n//2:0:-1]
         t2 = v[n//2+1:n]
         mul_uinv_a1 = mul_inv_hi_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
@@ -335,8 +330,6 @@ def mul_inv_lo_toep_mod(v, a, p, n):
                 (inverso * a[1] - v[1] * pow(inverso, 2, p) * a[0]) % p]
 
     if n % 2 == 0:
-        #t1 = v[n//2:0:-1]
-        #t2 = v[n//2+1:n]
         t1 = v[n//2:n]
         t2 = v[n//2-1:0:-1]
         mul_linv_a1 = mul_inv_lo_toep_mod(v[0:n//2], a[0:n//2], p, n//2)
